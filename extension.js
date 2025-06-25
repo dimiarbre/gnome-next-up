@@ -30,11 +30,14 @@ const IndicatorInstance = GObject.registerClass(Indicator);
 
 export default class NextUpExtension extends Extension {
   enable() {
+    this._settings = this.getSettings();
+    const textSize = this._settings.get_int("text-size");
     this._indicator = new IndicatorInstance({
       confettiGicon: Gio.icon_new_for_string(
         this.path + "/assets/party-popper.png"
       ),
       openPrefsCallback: this.openPreferences.bind(this),
+      textSize: textSize,
     });
 
     this._settings = this.getSettings();
@@ -43,6 +46,15 @@ export default class NextUpExtension extends Extension {
       () => {
         this.unloadIndicator();
         this.loadIndicator();
+      }
+    );
+
+    // Listen for text-size changes
+    this._textSizeChangedSignal = this._settings.connect(
+      "changed::text-size",
+      () => {
+        const newSize = this._settings.get_int("text-size");
+        this._indicator.setTextSize(newSize);
       }
     );
 
@@ -114,6 +126,7 @@ export default class NextUpExtension extends Extension {
     Main.panel._centerBox.remove_child(this._indicator.container);
 
     this._settings.disconnect(this._settingChangedSignal);
+    this._settings.disconnect(this._textSizeChangedSignal);
     this._settings = null;
 
     this._indicator.destroy();

@@ -5,5 +5,9 @@
     <key name="which-panel" type="i">
       <default>1</default>
     </key>
+    <key name="text-size" type="i">
+      <default>12</default>
+      <summary>Text size</summary>
+    </key>
   </schema>
 </schemalist>

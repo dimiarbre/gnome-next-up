@@ -8,18 +8,24 @@ import { gettext as _ } from "resource:///org/gnome/shell/extensions/extension.j
 
 export default class Indicator extends PanelMenu.Button {
   constructor(props) {
-    super();
-    this._confettiGicon = props.confettiGicon;
+    super(props.textSize, props.confettiGicon);
     this._openPrefsCallback = props.openPrefsCallback;
   }
 
-  _init() {
+  _init(textSize, confettiGicon) {
     super._init(0.0, _("Next Up Indicator"));
 
+    this._update_size_variables(textSize);
+    this._confettiGicon = confettiGicon;
     this._calendarSource = new Calendar.DBusEventSource();
 
     this._loadGUI();
     this._initialiseMenu();
+  }
+
+  _update_size_variables(textSize) {
+    this._font_size = textSize;
+    this._icon_size = this._font_size + 3;
   }
 
   _loadGUI() {
@@ -35,6 +41,7 @@ export default class Indicator extends PanelMenu.Button {
     this._alarmIcon = new St.Icon({
       icon_name: "alarm-symbolic",
       style_class: "system-status-icon",
+      icon_size: this._icon_size,
     });
 
     this.icon = this._alarmIcon;
@@ -43,6 +50,7 @@ export default class Indicator extends PanelMenu.Button {
       text: "Loading",
       y_expand: true,
       y_align: Clutter.ActorAlign.CENTER,
+      style: `font-size: ${this._font_size}px;`,
     });
 
     this._menuLayout.add_child(this.icon);
@@ -62,6 +70,16 @@ export default class Indicator extends PanelMenu.Button {
 
   setText(text) {
     this.text.set_text(text);
+  }
+
+  setTextSize(size) {
+    this._update_size_variables(size);
+    if (this.text) {
+      this.text.set_style(`font-size: ${this._font_size}px;`);
+    }
+    if (this.icon) {
+      this.icon.set_icon_size(this._icon_size);
+    }
   }
 
   showAlarmIcon() {

@@ -38,6 +38,31 @@ export default class NextUpExtensionPreferences extends ExtensionPreferences {
     row.add_suffix(dropdown);
     row.activatable_widget = dropdown;
 
+    // Create a new preferences row for text size
+    const textSizeRow = new Adw.ActionRow({ title: "Event text size" });
+    group.add(textSizeRow);
+
+    const textSizeSpin = new Gtk.SpinButton({
+      adjustment: new Gtk.Adjustment({
+        lower: 5,
+        upper: 50,
+        step_increment: 1,
+        page_increment: 5,
+        value: settings.get_int("text-size"),
+      }),
+      valign: Gtk.Align.CENTER,
+    });
+
+    settings.bind(
+      "text-size",
+      textSizeSpin,
+      "value",
+      Gio.SettingsBindFlags.DEFAULT
+    );
+
+    textSizeRow.add_suffix(textSizeSpin);
+    textSizeRow.activatable_widget = textSizeSpin;
+
     // Add our page to the window
     window.add(page);
   }
